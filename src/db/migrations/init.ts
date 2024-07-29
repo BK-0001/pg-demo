@@ -37,7 +37,7 @@ const run = async () => {
 
     console.log(`Successfully the table is generated and confirmed!`);
   } catch (err) {
-    console.log(`Oh no... something has gone wrong see the error: ${err}`);
+    console.error(`Oh no... something has gone wrong see the error: ${err}`);
   }
 };
 
