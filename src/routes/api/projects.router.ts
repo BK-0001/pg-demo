@@ -41,8 +41,17 @@ router.get("/:id", async (req: Request, res: Response) => {
   res.send(project);
 });
 
-router.post("/", (req: Request, res: Response) => {
-  res.send("");
+router.post("/", async (req: Request, res: Response) => {
+  const { title, description } = req.body;
+
+  const data = await pool.query(
+    `
+    INSERT INTO projects (title, description) VALUES ($1, $2) RETURNING *;  
+  `,
+    [title, description]
+  );
+
+  res.send(data.rows[0]);
 });
 
 router.put("/:id", (req: Request, res: Response) => {
