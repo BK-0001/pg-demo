@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "dev": "tsnd --inspect -- src/index.ts"
+    "dev": "tsnd --inspect -- src/index.ts",
+    "db:reset": "psql -d project_management < src/db/migrations/create.sql && psql -d project_management < src/db/seed.sql"
   },
   "author": "",
   "license": "ISC",
