@@ -22,8 +22,23 @@ router.get("/", async (req: Request, res: Response) => {
   res.send(data.rows);
 });
 
-router.get("/:id", (req: Request, res: Response) => {
-  res.send("");
+router.get("/:id", async (req: Request, res: Response) => {
+  const { id } = req.params;
+
+  const data = await pool.query<Project>(
+    `SELECT * FROM projects WHERE id = $1;`,
+    [id]
+  );
+
+  const project = data.rows[0];
+
+  if (!project) {
+    res
+      .status(404)
+      .json({ error: 404, message: `Record with id ${id} does not exist.` });
+  }
+
+  res.send(project);
 });
 
 router.post("/", (req: Request, res: Response) => {
