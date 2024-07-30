@@ -71,8 +71,32 @@ router.get("/:taskId", async (req: Request, res: Response) => {
 });
 
 // /api/v1/projects/:projectId/tasks
-router.post("/", (req: Request, res: Response) => {
-  res.json("");
+router.post("/", async (req: Request, res: Response) => {
+  const { projectId } = req.params;
+
+  const projectData = await pool.query("SELECT * FROM projects WHERE id = $1", [
+    projectId
+  ]);
+
+  const project = projectData.rows[0];
+
+  if (!project) {
+    // if not send 404
+    res.status(404).json({
+      error: 404,
+      message: `project with id ${projectId} does not exist`
+    });
+    return;
+  }
+
+  const { title, description } = req.body;
+
+  const taskData = await pool.query(
+    "INSERT INTO tasks (project_id, title, description) VALUES ($1, $2, $3) RETURNING *",
+    [projectId, title, description]
+  );
+
+  res.json(taskData.rows[0]);
 });
 
 // /api/v1/projects/:projectId/tasks/:id
