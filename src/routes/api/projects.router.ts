@@ -17,7 +17,7 @@ router.use("/:projectId/tasks", tasksRouter);
 router.get("/", async (req: Request, res: Response) => {
   const data = await pool.query<Project>(`SELECT * FROM projects;`);
 
-  res.send(data.rows);
+  res.json(data.rows);
 });
 
 router.get("/:id", async (req: Request, res: Response) => {
@@ -36,7 +36,7 @@ router.get("/:id", async (req: Request, res: Response) => {
       .json({ error: 404, message: `Record with id ${id} does not exist.` });
   }
 
-  res.send(project);
+  res.json(project);
 });
 
 router.post("/", async (req: Request, res: Response) => {
@@ -49,7 +49,7 @@ router.post("/", async (req: Request, res: Response) => {
     [title, description]
   );
 
-  res.send(data.rows[0]);
+  res.status(201).json(data.rows[0]);
 });
 
 router.put("/:id", async (req: Request, res: Response) => {
@@ -80,7 +80,7 @@ router.put("/:id", async (req: Request, res: Response) => {
     [title, description, id]
   );
 
-  res.send(updated.rows[0]);
+  res.json(updated.rows[0]);
 });
 
 router.delete("/:id", async (req: Request, res: Response) => {
