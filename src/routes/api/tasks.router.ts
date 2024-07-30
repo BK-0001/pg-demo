@@ -100,8 +100,52 @@ router.post("/", async (req: Request, res: Response) => {
 });
 
 // /api/v1/projects/:projectId/tasks/:id
-router.put("/:id", (req: Request, res: Response) => {
-  res.json("");
+router.put("/:taskId", async (req: Request, res: Response) => {
+  const { projectId, taskId } = req.params;
+
+  const projectData = await pool.query("SELECT * FROM projects WHERE id = $1", [
+    projectId
+  ]);
+
+  const project = projectData.rows[0];
+
+  if (!project) {
+    // if not send 404
+    res.status(404).json({
+      error: 404,
+      message: `project with id ${projectId} does not exist`
+    });
+    return;
+  }
+
+  const taskData = await pool.query(
+    "SELECT * FROM tasks WHERE id = $1 AND project_id = $2",
+    [taskId, projectId]
+  );
+
+  const task = taskData.rows[0];
+
+  if (!task) {
+    res.status(404).json({
+      error: 404,
+      message: `task with id ${taskId} does not exist`
+    });
+    return;
+  }
+
+  const { title, description, start_time, end_time } = req.body;
+
+  const updated = await pool.query(
+    `
+      UPDATE tasks 
+      SET title = $1, description = $2, start_time = $3, end_time = $4 
+      WHERE id = $5 AND project_id = $6
+      RETURNING *;
+    `,
+    [title, description, start_time, end_time, taskId, projectId]
+  );
+
+  res.json(updated.rows[0]);
 });
 
 // /api/v1/projects/:projectId/tasks/:id
